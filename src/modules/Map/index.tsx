@@ -85,6 +85,7 @@ const Draw = () => {
     const res: any[] = [];
     drawItems.eachLayer((l) => {
       if (l instanceof Polygon) {
+        console.warn(l.fenceAttributes)
         res.push({ ...l.fenceAttributes, coors: l.getLatLngs() });
       }
     });
@@ -122,6 +123,8 @@ const Draw = () => {
         name,
         fillColor: fillColor.toHexString(),
         borderColor: borderColor.toHexString(),
+        visible: true,
+        id: new Date().valueOf()
       };
       layer.addEventListener("click", () => {
         if (editStateRef.current) {
@@ -167,17 +170,25 @@ const Draw = () => {
     const form = editForm.getFieldsValue();
     const removeL: Polygon[] = [];
     drawItems.eachLayer((l) => {
-      if (l instanceof Polygon && l.fenceAttributes.name === form.name) {
+      if (l instanceof Polygon && l.fenceAttributes.id === form.id) {
         removeL.push(l);
         const plg = polygon(l.getLatLngs(), {
-          fillColor: form.fillColor.toHexString(),
-          color: form.borderColor.toHexString(),
+          fillColor: form.fillColor.toHexString?.() ?? form.fillColor,
+          color: form.borderColor.toHexString?.() ?? form.borderColor,
         });
         plg.fenceAttributes = {
           name: form.name,
-          fillColor: form.fillColor.toHexString(),
-          borderColor: form.borderColor.toHexString(),
+          fillColor: form.fillColor.toHexString?.() ?? form.fillColor,
+          borderColor: form.borderColor.toHexString?.() ?? form.borderColor,
+          visible: l.fenceAttributes.visible,
+          id: l.fenceAttributes.id
         };
+        plg.addEventListener("click", () => {
+        if (editStateRef.current) {
+          setOpenEdit(true);
+          editForm.setFieldsValue(plg.fenceAttributes);
+        }
+      });
         drawItems.addLayer(plg);
       }
     });
@@ -187,7 +198,7 @@ const Draw = () => {
   };
   return (
     <>
-      <Flex style={{ position: "absolute", top: 5, left: 5, zIndex: 999 }}>
+      <Flex gap={8} style={{ position: "absolute", top: 5, left: 5, zIndex: 999 }}>
         <Button onClick={toggleModal}>Add Geofence</Button>
         <Button onClick={onEdit}>
           {editState ? "Stop Edit" : "Edit Geofence"}
@@ -249,6 +260,7 @@ const Draw = () => {
           >
             <ColorPicker />
           </Form.Item>
+          <Form.Item name="id" style={{display: 'none'}}><Input /></Form.Item>
         </Form>
       </Modal>
     </>
