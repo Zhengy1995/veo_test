@@ -1,3 +1,17 @@
+# Recommand Node.js Version
+```bash
+v18-v21
+```
+# Install PNPM golbally
+```bash
+npm i -g pnpm
+```
+
+# Verify PNPM
+```bash
+pnpm -v
+```
+
 # Install Dependencies
 ```bash
 pnpm i
