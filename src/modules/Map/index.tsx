@@ -148,7 +148,10 @@ const Draw = () => {
     toggleModal();
   };
   const onEdit = () => {
-    if (!editState) editTool.enable();
+    if (!editState) {
+      message.info('Click the fence geometry for editing its properties')
+      editTool.enable();
+    }
     else {
       editTool.disable();
       storeGeofence();
